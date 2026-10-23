@@ -51,7 +51,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header meta={meta.data} onOpenMethodology={() => setMethodologyOpen(true)} />
-      <main className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4">
+      <main className="mx-auto flex w-full min-w-0 max-w-7xl flex-col gap-4 px-4 py-4">
         <Controls filters={filters} onChange={update} />
         <QueryState query={metrics} skeletonHeight={96}>
           {(data) =>
@@ -75,7 +75,7 @@ export default function App() {
             </>
           )}
         </QueryState>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid min-w-0 gap-4 lg:grid-cols-2">
           <DayDecisionPanel
             day={day}
             start={filters.start}
@@ -91,7 +91,7 @@ export default function App() {
         <QueryState query={metrics} skeletonHeight={320}>
           {(data) => (
             <>
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid min-w-0 gap-4 lg:grid-cols-2">
                 <ErrorByHourChart rows={data.by_hour} />
                 <ErrorHistogram histogram={data.histogram} summary={data.summary} />
               </div>

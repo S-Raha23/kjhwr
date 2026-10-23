@@ -1,11 +1,13 @@
-"""Application factory: lifespan (snapshot load), routers, error mapping, CORS."""
+"""Application factory: lifespan (snapshot load), routers, error mapping, CORS, SPA serving."""
 
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from pathlib import Path
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.routes import admin, analysis, health
 from app.core.config import CACHE_MAX_AGE_S, get_settings
@@ -16,6 +18,7 @@ from app.services.analysis_service import AnalysisService
 
 API_PREFIX = "/api"
 BAD_GATEWAY = 502
+STATIC_DIR = Path(__file__).resolve().parent / "static"
 
 
 @asynccontextmanager
@@ -40,7 +43,24 @@ async def cache_api_gets(
     return response
 
 
-def create_app() -> FastAPI:
+def mount_spa(app: FastAPI, static_dir: Path) -> None:
+    """Serve the built React app; any non-API GET falls back to ``index.html``."""
+    index = static_dir / "index.html"
+    if not index.is_file():
+        return
+    app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def spa(path: str) -> FileResponse:
+        if path == API_PREFIX.lstrip("/") or path.startswith(API_PREFIX.lstrip("/") + "/"):
+            raise HTTPException(status_code=404, detail="Not found")
+        candidate = (static_dir / path).resolve()
+        if path and candidate.is_file() and candidate.is_relative_to(static_dir.resolve()):
+            return FileResponse(candidate)
+        return FileResponse(index)
+
+
+def create_app(static_dir: Path = STATIC_DIR) -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="Wind Forecast Decision Portal", lifespan=lifespan)
     app.add_middleware(
@@ -51,6 +71,7 @@ def create_app() -> FastAPI:
     app.add_exception_handler(IngestValidationError, upstream_error_handler)
     for router in (health.router, analysis.router, admin.router):
         app.include_router(router, prefix=API_PREFIX)
+    mount_spa(app, static_dir)
     return app
 
 

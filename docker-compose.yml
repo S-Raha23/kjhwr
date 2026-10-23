@@ -1,0 +1,28 @@
+# Local development: API with auto-reload + Vite dev server with HMR.
+# Open http://localhost:5173 (the dev server proxies /api to the backend).
+services:
+  backend:
+    image: python:3.12-slim
+    working_dir: /app
+    command: sh -c "pip install --no-cache-dir -e '.[dev]' && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /web
+    command: sh -c "npm ci && npm run dev -- --host 0.0.0.0"
+    environment:
+      API_PROXY: http://backend:8000
+    volumes:
+      - ./frontend:/web
+      - frontend_node_modules:/web/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  frontend_node_modules:

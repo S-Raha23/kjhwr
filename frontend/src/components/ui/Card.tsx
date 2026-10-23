@@ -10,7 +10,9 @@ interface CardProps {
 
 export function Card({ title, subtitle, action, className = '', children }: CardProps) {
   return (
-    <section className={`rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}>
+    <section
+      className={`min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm ${className}`}
+    >
       {(title || action) && (
         <header className="mb-3 flex flex-wrap items-start justify-between gap-2">
           <div>

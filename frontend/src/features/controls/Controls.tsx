@@ -21,7 +21,7 @@ export function Controls({ filters, onChange }: ControlsProps) {
         end={filters.end}
         onChange={(range) => onChange({ ...range, day: null })}
       />
-      <fieldset className="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <fieldset className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-2">
         <legend className="sr-only">Forecast selection mode</legend>
         <span className="text-sm font-medium text-slate-700">Mode</span>
         <label className="flex items-center gap-2 text-sm">

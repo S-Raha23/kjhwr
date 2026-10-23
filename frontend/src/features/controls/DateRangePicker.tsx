@@ -13,7 +13,7 @@ const INPUT_CLASS =
 
 export function DateRangePicker({ start, end, onChange }: DateRangePickerProps) {
   return (
-    <fieldset className="flex flex-wrap items-center gap-2">
+    <fieldset className="flex min-w-0 flex-wrap items-center gap-2">
       <legend className="sr-only">Delivery date range</legend>
       <span className="text-sm font-medium text-slate-700">Delivery dates</span>
       <input
