@@ -11,7 +11,6 @@ export const LEAD_TIME_COMPARISON_H = { from: 24, to: 4 } as const
 
 export const GW_THRESHOLD_MW = 1000
 export const WORST_DAYS_COUNT = 3
-export const HOURS_PER_DAY = 24
 export const WEEK_DAYS = 7
 export const LAST_DAYS_PRESET = 3
 export const QUERY_STALE_MS = 5 * 60 * 1000

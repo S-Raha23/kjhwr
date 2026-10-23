@@ -75,9 +75,9 @@ heroku open -a <app>
    purchases, and wind is the biggest unknown."
 2. (1:30) Live demo of the default view: the forecast you had at 11:00 vs what happened. KPI tiles:
    "Off by ~2.0 GW on average, 17.7 % of wind energy."
-3. (1:00) The bias insight: "Forecasts were too high most of the time, by ~1.7 GW. Unadjusted,
+3. (1:00) The bias insight: "Forecasts were too high 84 % of the time (27 of 31 days), by ~1.7 GW. Unadjusted,
    that means systematic under-buying." Present curtailment as the hypothesis to verify together.
-4. (1:00) The day panel: pick the worst day and show the 80 % band, then: "This is how you'd size a safety margin."
+4. (1:00) The day panel: pick the worst day (Wed 28 Jan: MAE 5.3 GW, forecast energy 267 GWh vs 139 GWh actual) and show the 80 % band, then: "This is how you'd size a safety margin."
 5. (0:30) Lead time: "Waiting from 24 h to 4 h lead cuts the error by ~11 %, which informs how much to keep for intraday."
 6. (0:30) Next steps: live daily feed, alerts, more fuels, a cost-weighted error.
 
