@@ -1,6 +1,6 @@
 """Runtime settings (environment) and domain constants (the rules of the pilot)."""
 
-from datetime import date, time
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -23,6 +23,16 @@ MAX_PLAUSIBLE_GENERATION_MW = 30_000
 MIN_ACTUALS_COVERAGE = 0.95
 
 SOURCE_LABEL = "Elexon BMRS FUELHH (WIND) and WINDFOR"
+
+ELEXON_BASE_URL = "https://data.elexon.co.uk/bmrs/api/v1"
+ACTUALS_SETTLEMENT_FROM = date(2025, 12, 31)
+ACTUALS_SETTLEMENT_TO = date(2026, 2, 2)
+FORECAST_PUBLISH_FROM = datetime(2025, 12, 29, tzinfo=UTC)
+FORECAST_PUBLISH_TO = datetime(2026, 2, 1, tzinfo=UTC)
+FORECAST_CHUNK = timedelta(days=7)
+HTTP_TIMEOUT_S = 30.0
+HTTP_MAX_ATTEMPTS = 3
+HTTP_BACKOFF_BASE_S = 1.0
 
 
 class Settings(BaseSettings):
