@@ -50,7 +50,7 @@ GET /datasets/WINDFOR/stream?publishDateTimeFrom=2025-12-29T00:00:00Z&publishDat
   18:30, 22:30 UTC (one stray 12:25 run observed in the window). Expect occasional missing or extra runs; never hard-code these times.
 - Each run spans ~73 hourly points from about −25 h to +66 h relative to the publish
   time. Rows with `startTime < publishTime` exist and are **excluded** (decision M3).
-- The window Dec 29 – Feb 2 has 272 runs and 19,856 rows. A single request for that window succeeded. Still, the ingest
+- The window Dec 29 – Feb 2 has 280 runs and 20,440 rows. A single request for that window succeeded. Still, the ingest
   script must **chunk requests by 7 days** in case of server limits, then de-duplicate on (`publishTime`, `startTime`).
 - Observed Jan 2026 range: 2,250 – 21,353 MW.
 

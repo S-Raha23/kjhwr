@@ -23,7 +23,7 @@ add up to about 12.5 h, which leaves room inside the brief's 16-hour cap.
 - `app/data/snapshot_store.py`: load at startup (FastAPI lifespan) and expose `actuals`, `forecasts`, `version`, and `fetched_at`.
 - Tests: `tests/data/` (transform, validation, client with mocked HTTP).
 
-**Check:** the counts match docs/02 (FUELHH ~1,632 rows for the window; WINDFOR ~19,856 rows / 272 runs). `GET /api/meta` returns them.
+**Check:** the counts match docs/02 (FUELHH ~1,632 rows for the window; WINDFOR 20,440 rows / 280 runs). `GET /api/meta` returns them.
 
 ## Stage 2 — Analytics core (≈ 2.5 h) — the most important stage
 

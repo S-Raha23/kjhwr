@@ -13,7 +13,7 @@ def test_health_reports_loaded_snapshot() -> None:
 def test_meta_reports_snapshot_counts() -> None:
     with TestClient(app) as client:
         body = client.get("/api/meta").json()
-    assert body["counts"] == {"actual_rows": 1632, "forecast_rows": 19856, "forecast_runs": 272}
+    assert body["counts"] == {"actual_rows": 1632, "forecast_rows": 20440, "forecast_runs": 280}
     assert body["period"] == {
         "start": "2026-01-02",
         "end": "2026-02-01",

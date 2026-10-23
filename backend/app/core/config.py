@@ -28,7 +28,7 @@ ELEXON_BASE_URL = "https://data.elexon.co.uk/bmrs/api/v1"
 ACTUALS_SETTLEMENT_FROM = date(2025, 12, 31)
 ACTUALS_SETTLEMENT_TO = date(2026, 2, 2)
 FORECAST_PUBLISH_FROM = datetime(2025, 12, 29, tzinfo=UTC)
-FORECAST_PUBLISH_TO = datetime(2026, 2, 1, tzinfo=UTC)
+FORECAST_PUBLISH_TO = datetime(2026, 2, 2, tzinfo=UTC)
 FORECAST_CHUNK = timedelta(days=7)
 HTTP_TIMEOUT_S = 30.0
 HTTP_MAX_ATTEMPTS = 3

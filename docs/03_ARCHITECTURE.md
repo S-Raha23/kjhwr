@@ -183,7 +183,7 @@ Validation: return 422 for `start > end`, bad mode, or a horizon out of range. C
   "period": {"start":"2026-01-02","end":"2026-02-01","timezone":"Europe/London"},
   "decision_cutoff_local": "11:00",
   "horizon_range_h": [0, 48],
-  "counts": {"actual_rows": 1632, "forecast_rows": 19856, "forecast_runs": 272},
+  "counts": {"actual_rows": 1632, "forecast_rows": 20440, "forecast_runs": 280},
   "snapshot_fetched_at": "2026-10-23T23:59:00Z",
   "source": "Elexon BMRS FUELHH (WIND) and WINDFOR"
 }
