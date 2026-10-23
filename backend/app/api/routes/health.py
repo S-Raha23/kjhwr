@@ -1,8 +1,6 @@
-from typing import Annotated
+from fastapi import APIRouter
 
-from fastapi import APIRouter, Depends
-
-from app.api.deps import get_store
+from app.api.deps import StoreDep
 from app.api.schemas import HealthResponse, MetaResponse, PeriodInfo, SnapshotCounts
 from app.core.config import (
     DECISION_CUTOFF_LOCAL,
@@ -12,11 +10,8 @@ from app.core.config import (
     PERIOD_START,
     SOURCE_LABEL,
 )
-from app.data.snapshot_store import SnapshotStore
 
 router = APIRouter(tags=["health"])
-
-StoreDep = Annotated[SnapshotStore, Depends(get_store)]
 
 
 @router.get("/health")
