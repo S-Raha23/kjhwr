@@ -18,9 +18,9 @@ export function HorizonSlider({ value, disabled, onChange }: HorizonSliderProps)
         value={value}
         disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="w-40 accent-indigo-600 disabled:opacity-40"
+        className="w-40 accent-accent-600 disabled:opacity-40"
       />
-      <span className={`w-10 text-sm ${disabled ? 'text-slate-400' : 'text-slate-900'}`}>
+      <span className={`w-10 text-sm ${disabled ? 'text-ink-400' : 'text-ink-900'}`}>
         {value} h
       </span>
     </div>

@@ -107,30 +107,38 @@ Create exactly this structure. Do not add top-level folders without a reason rec
     ├── package.json  vite.config.ts  tsconfig.json  tailwind.config.ts  eslint.config.js
     ├── index.html
     └── src/
-        ├── main.tsx                   # providers (QueryClient, Router)
-        ├── App.tsx                    # page layout only — composes features
+        ├── main.tsx                   # providers (QueryClient, BrowserRouter)
+        ├── App.tsx                    # route table only
+        ├── pages/                     # composition layer: wires hooks to features
+        │   ├── StoryPage.tsx  ExplorePage.tsx  MethodPage.tsx  NotFoundPage.tsx
+        │   └── story/                 # one component per story chapter (Decision … Desk)
         ├── api/
         │   ├── client.ts              # fetch wrapper, ApiError
         │   ├── endpoints.ts           # getSeries(), getMetrics(), getHorizonCurve(), getDay(), getMeta()
         │   └── types.ts               # TS types mirroring backend schemas
-        ├── hooks/                     # TanStack Query hooks, one per endpoint
+        ├── hooks/                     # TanStack Query hooks (one per endpoint) + UI hooks
         │   └── useSeries.ts  useMetrics.ts  useHorizonCurve.ts  useDay.ts  useMeta.ts
+        │       useInView.ts  useReducedMotion.ts  useScrollProgress.ts
         ├── state/
-        │   └── useFilters.ts          # URL-synced filters: start, end, mode, horizonH, day
-        ├── features/                  # one folder per dashboard section (docs/05)
-        │   ├── header/                Header.tsx  MethodologyDrawer.tsx
-        │   ├── controls/              Controls.tsx  DateRangePicker.tsx  HorizonSlider.tsx
-        │   ├── kpis/                  KpiTiles.tsx  InsightStrip.tsx
+        │   └── useFilters.ts          # URL-synced explorer filters: start, end, mode, horizonH, day
+        ├── features/                  # presentational feature folders (never import each other)
+        │   ├── layout/                SiteNav.tsx  SiteFooter.tsx  SiteLayout.tsx
+        │   ├── story/                 Hero.tsx  DecisionTimeline.tsx  DayStrip.tsx  DeskTakeaways.tsx  facts.ts
+        │   ├── method/                MethodContent.tsx
+        │   ├── controls/              Controls.tsx  DateRangePicker.tsx  HorizonSlider.tsx  presets.ts
+        │   ├── kpis/                  KpiTiles.tsx  InsightStrip.tsx  insights.ts
         │   ├── timeseries/            ForecastVsActualChart.tsx  ErrorChart.tsx
-        │   ├── day-decision/          DayDecisionPanel.tsx
+        │   ├── day-decision/          DayView.tsx
         │   ├── horizon/               HorizonCurveChart.tsx
         │   ├── patterns/              ErrorByHourChart.tsx  ErrorHistogram.tsx
         │   └── daily-table/           DailyTable.tsx
-        ├── components/ui/             # generic, feature-agnostic: Card, Skeleton, ErrorState, EmptyState, InfoTooltip
+        ├── components/ui/             # generic, feature-agnostic: Card, Chapter, Callout, StatBlock,
+        │                              # Reveal, CountUp, Skeleton, ErrorState, EmptyState, InfoTooltip, QueryState
         ├── lib/
         │   ├── format.ts              # MW/GW, %, London-time formatting
         │   ├── chartTheme.ts          # series colours, error colours, axis defaults
-        │   └── constants.ts           # period bounds, horizon range
+        │   ├── chartTicks.ts  rank.ts
+        │   └── constants.ts           # period bounds, horizon range, routes, data sources
         └── test/                      # vitest setup; *.test.ts(x) live next to the file they test
 ```
 
@@ -145,9 +153,10 @@ The reviewer is a tech lead. The structure must read as deliberate, not accreted
 - `services/` is the only place that combines the store with analytics and owns caching.
 
 **Frontend:**
+- `pages/` is the composition layer: it calls hooks and wires data into features. Features are presentational and take data as props.
 - Components never call `fetch` directly; they use hooks from `hooks/`. Hooks use `api/endpoints.ts`.
 - No metric computation in the frontend. The backend computes, the frontend formats and draws.
-- Feature components may import from `components/ui`, `lib`, `hooks`, `state`. A feature never imports another feature (`App.tsx` composes them).
+- Feature components may import from `components/ui`, `lib`, `hooks`, `state`. A feature never imports another feature (`pages/` compose them).
 - Colours and formatting come only from `lib/chartTheme.ts` and `lib/format.ts`. No inline hex codes or ad-hoc `toFixed` in components.
 
 **General:**

@@ -7,7 +7,7 @@ export function Skeleton({ height = 160 }: SkeletonProps) {
     <div
       role="status"
       aria-label="Loading"
-      className="w-full animate-pulse rounded-lg bg-slate-100"
+      className="w-full animate-pulse rounded-lg bg-ink-100"
       style={{ height }}
     />
   )

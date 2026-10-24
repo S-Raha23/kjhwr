@@ -9,6 +9,8 @@ export const DEFAULT_HORIZON_H = 24
 export const CUTOFF_LEAD_RANGE_H = { min: 14.5, max: 37.5 } as const
 export const LEAD_TIME_COMPARISON_H = { from: 24, to: 4 } as const
 
+export const ROUTES = { story: '/', explore: '/explore', method: '/method' } as const
+
 export const GW_THRESHOLD_MW = 1000
 export const WORST_DAYS_COUNT = 3
 export const WEEK_DAYS = 7

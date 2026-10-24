@@ -17,7 +17,7 @@ export function InsightStrip({ metrics, curve, onSelectDay }: InsightStripProps)
 
   return (
     <Card title="Key insights">
-      <ul className="space-y-1.5 text-sm text-slate-800">
+      <ul className="space-y-1.5 text-sm text-ink-800">
         {insights.map((insight) => (
           <li key={insight.id}>
             {insight.text}
@@ -26,7 +26,7 @@ export function InsightStrip({ metrics, curve, onSelectDay }: InsightStripProps)
                 key={day}
                 type="button"
                 onClick={() => onSelectDay(day)}
-                className="ml-2 rounded-full border border-indigo-200 px-2 py-0.5 text-xs text-indigo-700 hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                className="ml-2 rounded-full border border-accent-200 px-2 py-0.5 text-xs text-accent-700 hover:bg-accent-50 focus:outline-none focus:ring-2 focus:ring-accent-400"
               >
                 {formatLondonDay(day)}
               </button>

@@ -11,9 +11,15 @@ import {
   YAxis,
 } from 'recharts'
 import type { SeriesPoint } from '../../api/types'
-import { Card } from '../../components/ui/Card'
 import { dayTicks } from '../../lib/chartTicks'
-import { AXIS, CHART_HEIGHT, COLORS, LEGEND_STYLE, LINE_WIDTH } from '../../lib/chartTheme'
+import {
+  AXIS,
+  BRUSH_EXTRA_HEIGHT,
+  CHART_HEIGHT,
+  COLORS,
+  LEGEND_STYLE,
+  LINE_WIDTH,
+} from '../../lib/chartTheme'
 import {
   formatGwTick,
   formatHours,
@@ -26,7 +32,8 @@ import {
 
 interface ForecastVsActualChartProps {
   points: SeriesPoint[]
-  onSelectDay: (day: string) => void
+  /** When given, clicking the chart picks the delivery day under the cursor. */
+  onSelectDay?: (day: string) => void
 }
 
 interface Row extends SeriesPoint {
@@ -37,8 +44,8 @@ function SeriesTooltip({ active, payload }: { active?: boolean; payload?: { payl
   const row = payload?.[0]?.payload
   if (!active || !row) return null
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-2 text-xs shadow">
-      <p className="font-semibold">{formatLondonDateTime(row.ts)} UK time</p>
+    <div className="rounded-xl border border-ink-100 bg-white p-3 text-xs shadow-card">
+      <p className="font-semibold text-ink-900">{formatLondonDateTime(row.ts)} UK time</p>
       <p>Actual: {formatMw(row.actual)}</p>
       {row.forecast !== null && row.error !== null && row.forecast_published !== null && (
         <>
@@ -54,68 +61,62 @@ function SeriesTooltip({ active, payload }: { active?: boolean; payload?: { payl
 
 export function ForecastVsActualChart({ points, onSelectDay }: ForecastVsActualChartProps) {
   const rows = useMemo<Row[]>(() => points.map((p) => ({ ...p, ts: Date.parse(p.t) })), [points])
-
   const ticks = useMemo(() => dayTicks(rows.map((r) => r.ts)), [rows])
 
   return (
-    <Card
-      title="① Forecast vs actual"
-      subtitle="Actual (30-min) against the forecast you had at decision time (hourly). Click the chart to pick a delivery day."
-    >
-      <div role="img" aria-label="Line chart of forecast against actual wind generation">
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT + 40}>
-          <LineChart
-            data={rows}
-            onClick={(state) => {
-              if (typeof state?.activeLabel === 'number')
-                onSelectDay(toLondonDay(state.activeLabel))
-            }}
-          >
-            <CartesianGrid vertical={false} stroke={COLORS.grid} />
-            <XAxis
-              dataKey="ts"
-              type="number"
-              scale="time"
-              ticks={ticks}
-              domain={['dataMin', 'dataMax']}
-              tick={AXIS.tick}
-              tickFormatter={formatLondonShortDay}
-              label={{ value: 'UK time', position: 'insideBottomRight', offset: -4, fontSize: 11 }}
-            />
-            <YAxis
-              tick={AXIS.tick}
-              tickFormatter={formatGwTick}
-              label={{ value: 'GW', angle: -90, position: 'insideLeft', fontSize: 11 }}
-            />
-            <Tooltip content={<SeriesTooltip />} />
-            <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
-            <Line
-              name="Actual (30-min)"
-              dataKey="actual"
-              stroke={COLORS.actual}
-              strokeWidth={LINE_WIDTH}
-              dot={false}
-              isAnimationActive={false}
-            />
-            <Line
-              name="Forecast used (hourly)"
-              dataKey="forecast"
-              stroke={COLORS.forecast}
-              strokeWidth={LINE_WIDTH}
-              strokeDasharray="5 3"
-              connectNulls
-              dot={false}
-              isAnimationActive={false}
-            />
-            <Brush
-              dataKey="ts"
-              height={24}
-              stroke={COLORS.marker}
-              tickFormatter={formatLondonShortDay}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
+    <div role="img" aria-label="Line chart of forecast against actual wind generation">
+      <ResponsiveContainer width="100%" height={CHART_HEIGHT + BRUSH_EXTRA_HEIGHT}>
+        <LineChart
+          data={rows}
+          onClick={(state) => {
+            if (onSelectDay && typeof state?.activeLabel === 'number')
+              onSelectDay(toLondonDay(state.activeLabel))
+          }}
+        >
+          <CartesianGrid vertical={false} stroke={COLORS.grid} />
+          <XAxis
+            dataKey="ts"
+            type="number"
+            scale="time"
+            ticks={ticks}
+            domain={['dataMin', 'dataMax']}
+            tick={AXIS.tick}
+            tickFormatter={formatLondonShortDay}
+            label={{ value: 'UK time', position: 'insideBottomRight', offset: -4, fontSize: 11 }}
+          />
+          <YAxis
+            tick={AXIS.tick}
+            tickFormatter={formatGwTick}
+            label={{ value: 'GW', angle: -90, position: 'insideLeft', fontSize: 11 }}
+          />
+          <Tooltip content={<SeriesTooltip />} />
+          <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
+          <Line
+            name="Actual (30-min)"
+            dataKey="actual"
+            stroke={COLORS.actual}
+            strokeWidth={LINE_WIDTH}
+            dot={false}
+            isAnimationActive={false}
+          />
+          <Line
+            name="Forecast used (hourly)"
+            dataKey="forecast"
+            stroke={COLORS.forecast}
+            strokeWidth={LINE_WIDTH}
+            strokeDasharray="5 3"
+            connectNulls
+            dot={false}
+            isAnimationActive={false}
+          />
+          <Brush
+            dataKey="ts"
+            height={24}
+            stroke={COLORS.marker}
+            tickFormatter={formatLondonShortDay}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

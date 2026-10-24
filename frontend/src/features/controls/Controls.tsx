@@ -23,14 +23,14 @@ export function Controls({ filters, onChange }: ControlsProps) {
       />
       <fieldset className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-2">
         <legend className="sr-only">Forecast selection mode</legend>
-        <span className="text-sm font-medium text-slate-700">Mode</span>
+        <span className="text-sm font-medium text-ink-700">Mode</span>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="radio"
             name="mode"
             checked={!horizonMode}
             onChange={() => setMode('cutoff')}
-            className="accent-indigo-600"
+            className="accent-accent-600"
           />
           Decision time: {DECISION_CUTOFF_LABEL}
         </label>
@@ -40,7 +40,7 @@ export function Controls({ filters, onChange }: ControlsProps) {
             name="mode"
             checked={horizonMode}
             onChange={() => setMode('horizon')}
-            className="accent-indigo-600"
+            className="accent-accent-600"
           />
           Custom lead time
         </label>
@@ -51,7 +51,7 @@ export function Controls({ filters, onChange }: ControlsProps) {
         />
       </fieldset>
       {horizonMode && (
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-ink-500">
           Using latest forecast published ≥ {filters.horizonH} h before each half-hour.
         </p>
       )}

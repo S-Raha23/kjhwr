@@ -11,7 +11,6 @@ import {
   YAxis,
 } from 'recharts'
 import type { Histogram, Summary } from '../../api/types'
-import { Card } from '../../components/ui/Card'
 import { AXIS, CHART_HEIGHT, COLORS, TOOLTIP_STYLE } from '../../lib/chartTheme'
 import { formatGwTick, formatMw, formatSignedMw } from '../../lib/format'
 
@@ -42,10 +41,7 @@ export function ErrorHistogram({ histogram, summary }: ErrorHistogramProps) {
   const p90Bin = binContaining(bins, summary.p90_signed)
 
   return (
-    <Card
-      title="⑥ Error distribution"
-      subtitle="How often the forecast missed by each amount. Dashed lines: P10 and P90 of the error."
-    >
+    <div>
       <div role="img" aria-label="Histogram of signed forecast errors">
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
           <BarChart data={bins} barCategoryGap={1}>
@@ -66,7 +62,7 @@ export function ErrorHistogram({ histogram, summary }: ErrorHistogramProps) {
             {p90Bin !== null && (
               <ReferenceLine x={p90Bin} stroke={COLORS.marker} strokeDasharray="4 2" />
             )}
-            <Bar dataKey="count" isAnimationActive={false}>
+            <Bar dataKey="count" radius={[3, 3, 0, 0]} isAnimationActive={false}>
               {bins.map((bin) => (
                 <Cell key={bin.lower} fill={bin.lower >= 0 ? COLORS.over : COLORS.under} />
               ))}
@@ -74,11 +70,11 @@ export function ErrorHistogram({ histogram, summary }: ErrorHistogramProps) {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <p className="mt-1 text-xs text-slate-500">
-        Error (GW): forecast − actual. P10{' '}
-        {summary.p10_signed !== null && formatMw(summary.p10_signed)}, P90{' '}
+      <p className="mt-2 text-xs text-ink-500">
+        Error in GW (forecast − actual); bars are hours. Dashed lines: P10{' '}
+        {summary.p10_signed !== null && formatMw(summary.p10_signed)} and P90{' '}
         {summary.p90_signed !== null && formatMw(summary.p90_signed)}.
       </p>
-    </Card>
+    </div>
   )
 }

@@ -4,6 +4,14 @@ Audience: a day-ahead power trader. They are numerate and time-poor, and they th
 delivery days, and gate closure**. The app is a single-page dashboard. Clarity beats
 features. Every number has a unit and a plain-English line.
 
+> **v1.1 redesign (supersedes the single-page layout in §1).** The app is now three routes:
+> `/` **the story**, a scrolling narrative in six chapters (the decision, one day up close, the
+> whole month, the bias, does waiting help, what it means for the desk) with a hero of headline
+> numbers; `/explore`, the interactive dashboard described in §1-§2 (same controls, charts and
+> URL state); and `/method`, the methodology that used to live in a drawer. Story text is computed
+> from API data, never hard-coded. Motion (scroll reveals, count-up numbers, flowing hero lines)
+> is disabled for users who prefer reduced motion. §2 behaviour, units, colours and tests still apply.
+
 ## 1. Layout (desktop ≥ 1280 px; must remain usable down to 390 px wide)
 
 ```

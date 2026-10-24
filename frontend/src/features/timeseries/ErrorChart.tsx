@@ -11,7 +11,6 @@ import {
   YAxis,
 } from 'recharts'
 import type { SeriesPoint } from '../../api/types'
-import { Card } from '../../components/ui/Card'
 import { dayTicks } from '../../lib/chartTicks'
 import { AXIS, CHART_HEIGHT, COLORS, LEGEND_STYLE, TOOLTIP_STYLE } from '../../lib/chartTheme'
 import {
@@ -46,56 +45,50 @@ function toRows(points: SeriesPoint[]): Row[] {
 
 export function ErrorChart({ points }: ErrorChartProps) {
   const rows = useMemo(() => toRows(points), [points])
-
   const ticks = useMemo(() => dayTicks(rows.map((r) => r.ts)), [rows])
 
   return (
-    <Card
-      title="② Forecast error over time"
-      subtitle="Forecast − actual. Above zero: forecast too high, you'd be short. Below zero: too low, you'd be long."
-    >
-      <div role="img" aria-label="Bar chart of forecast error over time">
-        <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-          <BarChart data={rows} barCategoryGap={0}>
-            <CartesianGrid vertical={false} stroke={COLORS.grid} />
-            <XAxis
-              dataKey="ts"
-              type="number"
-              scale="time"
-              ticks={ticks}
-              domain={['dataMin', 'dataMax']}
-              tick={AXIS.tick}
-              tickFormatter={formatLondonShortDay}
-            />
-            <YAxis
-              tick={AXIS.tick}
-              tickFormatter={formatGwTick}
-              label={{ value: 'GW', angle: -90, position: 'insideLeft', fontSize: 11 }}
-            />
-            <ReferenceLine y={0} stroke={COLORS.marker} />
-            <Tooltip
-              {...TOOLTIP_STYLE}
-              labelFormatter={(ts) => `${formatLondonDateTime(Number(ts))} UK time`}
-              formatter={(value) => formatSignedMw(Number(value))}
-            />
-            <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
-            <Bar
-              name="Too high (+, short)"
-              dataKey="over"
-              fill={COLORS.over}
-              stackId="error"
-              isAnimationActive={false}
-            />
-            <Bar
-              name="Too low (−, long)"
-              dataKey="under"
-              fill={COLORS.under}
-              stackId="error"
-              isAnimationActive={false}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </Card>
+    <div role="img" aria-label="Bar chart of forecast error over time">
+      <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
+        <BarChart data={rows} barCategoryGap={0}>
+          <CartesianGrid vertical={false} stroke={COLORS.grid} />
+          <XAxis
+            dataKey="ts"
+            type="number"
+            scale="time"
+            ticks={ticks}
+            domain={['dataMin', 'dataMax']}
+            tick={AXIS.tick}
+            tickFormatter={formatLondonShortDay}
+          />
+          <YAxis
+            tick={AXIS.tick}
+            tickFormatter={formatGwTick}
+            label={{ value: 'GW', angle: -90, position: 'insideLeft', fontSize: 11 }}
+          />
+          <ReferenceLine y={0} stroke={COLORS.marker} />
+          <Tooltip
+            {...TOOLTIP_STYLE}
+            labelFormatter={(ts) => `${formatLondonDateTime(Number(ts))} UK time`}
+            formatter={(value) => formatSignedMw(Number(value))}
+          />
+          <Legend verticalAlign="top" wrapperStyle={LEGEND_STYLE} />
+          <Bar
+            name="Too high (+, short)"
+            dataKey="over"
+            fill={COLORS.over}
+            stackId="error"
+            isAnimationActive={false}
+          />
+          <Bar
+            name="Too low (−, long)"
+            dataKey="under"
+            fill={COLORS.under}
+            stackId="error"
+            isAnimationActive={false}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

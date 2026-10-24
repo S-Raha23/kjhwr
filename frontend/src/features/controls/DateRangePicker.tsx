@@ -9,13 +9,13 @@ interface DateRangePickerProps {
 
 const PRESETS = rangePresets()
 const INPUT_CLASS =
-  'rounded-md border border-slate-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400'
+  'rounded-md border border-ink-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-accent-400'
 
 export function DateRangePicker({ start, end, onChange }: DateRangePickerProps) {
   return (
     <fieldset className="flex min-w-0 flex-wrap items-center gap-2">
       <legend className="sr-only">Delivery date range</legend>
-      <span className="text-sm font-medium text-slate-700">Delivery dates</span>
+      <span className="text-sm font-medium text-ink-700">Delivery dates</span>
       <input
         type="date"
         aria-label="Start delivery date"
@@ -44,10 +44,10 @@ export function DateRangePicker({ start, end, onChange }: DateRangePickerProps) 
               type="button"
               aria-pressed={active}
               onClick={() => onChange({ start: preset.start, end: preset.end })}
-              className={`rounded-full border px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 ${
+              className={`rounded-full border px-2.5 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-accent-400 ${
                 active
-                  ? 'border-indigo-600 bg-indigo-600 text-white'
-                  : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+                  ? 'border-accent-600 bg-accent-600 text-white'
+                  : 'border-ink-300 text-ink-700 hover:bg-ink-50'
               }`}
             >
               {preset.label}

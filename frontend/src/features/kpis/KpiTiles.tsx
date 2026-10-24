@@ -38,13 +38,16 @@ export function KpiTiles({ summary }: KpiTilesProps) {
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
       {buildTiles(summary).map((tile) => (
-        <div key={tile.label} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+        <div
+          key={tile.label}
+          className="min-w-0 rounded-2xl border border-ink-100 bg-white p-4 shadow-card"
+        >
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-400">
             {tile.label}
             {tile.hint && <InfoTooltip text={tile.hint} />}
           </p>
-          <p className="mt-1 text-2xl font-semibold text-slate-900">{tile.value}</p>
-          <p className="mt-1 text-xs text-slate-500">{tile.note}</p>
+          <p className="mt-1 font-display text-3xl font-semibold text-ink-900">{tile.value}</p>
+          <p className="mt-1 text-xs text-ink-500">{tile.note}</p>
         </div>
       ))}
     </div>

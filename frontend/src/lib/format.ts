@@ -86,3 +86,7 @@ export function toLondonDay(instant: string | number): string {
 export function formatSignedMwh(mwh: number): string {
   return signed(mwh, formatMwh(Math.abs(mwh)))
 }
+
+export function formatSignedGw(mw: number): string {
+  return signed(mw, formatGw(Math.abs(mw)))
+}
