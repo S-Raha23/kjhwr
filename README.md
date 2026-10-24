@@ -88,7 +88,21 @@ These are one month of national data: a pilot, not a verdict.
 
 ### Choosing the forecast (the core rule)
 
-Forecasts are published several times a day (about eight runs), and each run covers roughly the next 66 hours. The portal must not use information that did not exist yet, so for each target hour:
+Forecasts are published several times a day (about eight runs), and each run covers roughly the next 66 hours. The portal must not use information that did not exist yet. Example for delivery day **Wed 28 Jan** (times UTC; in January UK time = UTC):
+
+```mermaid
+flowchart LR
+    r1["02:30 run"] --> r2["04:30 run"] --> r3["07:30 run"] --> r4["<b>09:30 run</b><br/>latest before the cutoff<br/>✅ USED for all 24 hours"]
+    r4 --> cut{{"<b>11:00 Tue 27 Jan</b><br/>gate closure = decision"}}
+    cut --> r5["11:30 run<br/>❌ too late, ignored"] --> d["Delivery day<br/>Wed 28 Jan 00:00 – 24:00<br/>(14.5 h – 37.5 h ahead)"]
+
+    classDef used fill:#effcf9,stroke:#0d8274,color:#0b1220
+    classDef late fill:#fff7ed,stroke:#d97706,color:#0b1220
+    class r4 used
+    class r5 late
+```
+
+The rule, for each target hour:
 
 ```
 Decision-time mode (default)
@@ -127,19 +141,128 @@ Alignment: forecasts are hourly and actuals are half-hourly, so accuracy is meas
 
 ## Architecture
 
+### 1. The big picture
+
+The whole product is **one Docker container**. Inside it, a FastAPI server does two jobs: it hands the browser the website (the built React app) and it answers the website's data requests (`/api/...`). The data lives **in memory**, loaded at start-up from a snapshot file kept in the repository. Elexon's API is contacted **only** when someone deliberately refreshes the data.
+
+```mermaid
+flowchart LR
+    subgraph browser["User's browser"]
+        react["React website<br/>Story · Explore · Method"]
+    end
+
+    subgraph container["Heroku · one Docker container · FastAPI (Python)"]
+        direction TB
+        static["Website files<br/>(built React app)"]
+        api["API routes /api/...<br/>check the request"]
+        svc["Analysis service<br/>runs the analysis · caches results"]
+        ana["Analytics<br/>pure rules: pick forecast,<br/>compare, measure error"]
+        store[("Data in memory<br/>actuals + forecasts")]
+    end
+
+    subgraph sources["Where the data comes from"]
+        direction TB
+        snap[("Data snapshot<br/>Parquet files in the repo<br/>(used at every start-up)")]
+        elexon[["Elexon BMRS API<br/>FUELHH actuals · WINDFOR forecasts<br/>(only when data is refreshed)"]]
+    end
+
+    react -- "1 · opens the site" --> static
+    react -- "2 · asks for numbers (JSON)" --> api
+    api --> svc
+    svc -- "passes the data" --> ana
+    svc -- "reads" --> store
+    snap -- "loaded" --> store
+    elexon -. "fetch → validate → swap in" .-> store
+
+    classDef ext fill:#fff7ed,stroke:#d97706,color:#0b1220
+    classDef data fill:#effcf9,stroke:#0d8274,color:#0b1220
+    classDef logic fill:#f3f5f9,stroke:#4b5a75,color:#0b1220
+    class elexon ext
+    class store,snap data
+    class api,svc,ana,static,react logic
 ```
-            ┌────────────────── Docker image (one web process) ──────────────────┐
-Browser ──► │ FastAPI (uvicorn)                                                    │
-            │  ├── /api/*   JSON analytics endpoints                               │
-            │  └── /*       built React app (client-side routes fall back to index) │
-            │ SnapshotStore: pandas frames loaded at start-up from Parquet files   │
-            │  ▲                                                                   │
-            │  └── refresh: Elexon client → validate → atomic swap                 │
-            └────────────────────────────────────────────┬─────────────────────────┘
-                                                         │ only on refresh / ingest
-                                                         ▼
-                                           data.elexon.co.uk/bmrs/api/v1
+
+### 2. How the code is organised
+
+Each layer has **one job** and may only call the layers below it. The analysis rules are **pure functions** (no internet, no files, no web framework), so they can be tested quickly and exactly.
+
+```mermaid
+flowchart TB
+    subgraph FE["Frontend · React + TypeScript"]
+        direction TB
+        pages["pages/<br/>Story · Explore · Method<br/>(put the pieces together)"]
+        features["features/<br/>charts, tables, story chapters<br/>(display only)"]
+        ui["components/ui/<br/>cards, layout, animations"]
+        hooks["hooks/<br/>one data hook per endpoint<br/>(TanStack Query: caching, loading)"]
+        client["api/client.ts<br/>the ONLY place that calls the server"]
+        pages --> features --> ui
+        pages --> hooks --> client
+    end
+
+    subgraph BE["Backend · Python + FastAPI"]
+        direction TB
+        apiL["api/<br/>HTTP only: validate, respond"]
+        svcL["services/<br/>orchestration + cache"]
+        anaL["analytics/<br/>pure business rules"]
+        dataL["data/<br/>the ONLY place that touches<br/>the network or disk"]
+        coreL["core/<br/>settings · constants · errors<br/>(usable by every layer)"]
+        apiL --> svcL
+        svcL --> anaL
+        svcL --> dataL
+    end
+
+    client -- "HTTPS JSON" --> apiL
 ```
+
+### 3. What happens when a page asks for numbers
+
+Example: the explorer loads the accuracy summary.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant B as Browser (React)
+    participant R as API route
+    participant S as Analysis service
+    participant C as Cache
+    participant A as Analytics (pure)
+    participant D as Data in memory
+
+    B->>R: GET /api/metrics?mode=cutoff
+    R->>R: check inputs, clamp dates (bad input → 422)
+    R->>S: metrics(query)
+    S->>C: already computed for this query and this data version?
+    alt yes (cache hit)
+        C-->>S: stored result
+    else no (cache miss)
+        S->>D: current forecasts and actuals
+        S->>A: pick 11:00 D-1 forecast → compare with actual → measure
+        A-->>S: MAE, bias, WAPE, by hour, by day…
+        S->>C: remember result
+    end
+    S-->>R: result
+    R-->>B: JSON (browser may reuse it for 5 minutes)
+```
+
+The cache key includes the **data version**, so after a refresh old results can never be served for new data.
+
+### 4. How data gets in (and why bad data can't)
+
+```mermaid
+flowchart LR
+    E[["Elexon API"]] --> C["Fetch<br/>7-day chunks<br/>3 tries with back-off"]
+    C --> T["Clean<br/>UTC times · MW numbers<br/>remove duplicates"]
+    T --> V{"Validate<br/>≥ 95 % of half-hours?<br/>a forecast before every cutoff?<br/>values 0 – 30,000 MW?"}
+    V -- "all pass" --> W[("New snapshot<br/>saved to Parquet (ingest)<br/>or swapped into memory (refresh)")]
+    V -- "any fail" --> K["Reject · keep the old data<br/>(refresh answers 502)"]
+
+    classDef ok fill:#effcf9,stroke:#0d8274,color:#0b1220
+    classDef bad fill:#fff7ed,stroke:#d97706,color:#0b1220
+    class W ok
+    class K bad
+```
+
+### Design choices in one line each
 
 - **One process, one container, no database server.** The working set is about 20,000 forecast rows and 1,600 actual rows, so pandas in memory is ample.
 - **Snapshot first.** A Parquet snapshot of the January 2026 data is committed, so the app starts with no network access. A protected endpoint (or the ingest command) can re-fetch live; a failed refresh keeps serving the old data.
