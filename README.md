@@ -5,7 +5,7 @@ wind-generation forecast that was available when the team had to commit to tomor
 (11:00 UK time on D-1), and measures, quantitatively, how accurate those forecasts were in
 January 2026.
 
-**Live app:** `https://<heroku-app-name>.herokuapp.com` _(set after deploying, see [Deploy](#deploy-to-heroku))_
+**Live app:** https://windportal-kjhwr-1dbe5a49eece.herokuapp.com
 
 ![Dashboard](docs/img/dashboard-top.png)
 
